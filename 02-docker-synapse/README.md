@@ -40,7 +40,7 @@ Do **not** add `-v` unless you want to delete the PostgreSQL volume. Never regen
 
 ## Fresh clone only
 
-Skip if `.env.synapse` or `synapse-data/homeserver.yaml` already exists.
+Skip if `.env.synapse` or `synapse-data/homeserver.yaml` already exists. Run from `02-docker-synapse/` (`cd 02-docker-synapse` first), or the secrets file lands in the wrong folder.
 
 ```bash
 umask 077
