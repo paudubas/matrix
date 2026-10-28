@@ -21,17 +21,9 @@ brew install kubectl helm      # Rancher Desktop also bundles them in ~/.rd/bin
 
 `openssl` (for the certificate below) is preinstalled on macOS and most Linux. Trusting the certificate with `security` is macOS-only; on Linux add it to your system or browser trust store.
 
-## Operate
-
-Always pass the context explicitly:
-
-```bash
-kubectl --context rancher-desktop -n ess get pods,ingress
-```
-
 ## Install
 
-Values: `hostnames.yaml` and `local-http.yaml` (never use the HTTP-only values publicly). Run from this folder.
+Values: `hostnames.yaml` and `local-http.yaml` (never use the HTTP-only values publicly). Run from this folder. The `--namespace ess --create-namespace` options create the `ess` namespace as part of this install command.
 
 ```bash
 helm upgrade --install ess \
@@ -39,6 +31,15 @@ helm upgrade --install ess \
   --kube-context rancher-desktop --namespace ess --create-namespace \
   -f hostnames.yaml -f local-http.yaml \
   --wait --timeout 15m
+```
+
+## Check the installation
+
+The status command only lists resources; it does not create the namespace.
+Run it after the install command above:
+
+```bash
+kubectl --context rancher-desktop -n ess get pods,ingress
 ```
 
 ## Create the admin account
