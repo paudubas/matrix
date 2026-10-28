@@ -50,7 +50,7 @@ git clone https://github.com/paudubas/matrix.git && cd matrix
 | Scenario | Run from | Start |
 |---|---|---|
 | 1 | `01-docker-tuwunel/` | `docker compose up -d` (Tuwunel itself: see its README) |
-| 2 | `02-docker-synapse/` | `./setup.sh` then `docker compose --env-file .env.synapse up -d` |
+| 2 | `02-docker-synapse/` | `./setup.sh`, then `docker compose --env-file .env.synapse up -d`, wait for `healthy`, then create the admin (steps in its README) |
 | 3 | `03-ess-rancher/` | see its README (Helm) |
 | 4, 5, 6 VMs | `04-hetzner-terraform/` (or `terraform -chdir=04-hetzner-terraform ...` from the root) | `terraform init && terraform apply` |
 | 5 script | `05-bare-metal/` | `install-tuwunel.sh` on the target machine |

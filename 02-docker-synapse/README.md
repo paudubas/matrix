@@ -15,6 +15,20 @@ docker --version && docker compose version && openssl version
 
 Linux: <https://docs.docker.com/engine/install/> (with the Compose plugin).
 
+## Quick start (in this order)
+
+From the repo root:
+
+```bash
+cd 02-docker-synapse
+./setup.sh                                   # 1. creates .env.synapse (secrets) and synapse-data/ (config); starts nothing
+docker compose --env-file .env.synapse up -d # 2. starts Postgres, Synapse, Element
+docker compose --env-file .env.synapse ps    # 3. wait until synapse shows "healthy"
+docker compose --env-file .env.synapse exec -it synapse register_new_matrix_user -c /data/homeserver.yaml -c /tmp/postgres.yaml -u admin -a http://localhost:8008   # 4. create the admin
+```
+
+Then sign in at <http://localhost:8083>. `exec` only works on a running stack, so step 2 must come before step 4. Details follow below.
+
 ## Create the admin
 
 Use the demo password `hackathon-2026` when prompted (or run the VS Code task *Create Docker Synapse admin*).
