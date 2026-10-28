@@ -29,6 +29,7 @@ No SSH key or other local tools are needed; the VMs configure themselves with cl
 Terraform state contains the registration tokens: keep it private (git-ignored). `HCLOUD_TOKEN` must be exported in your terminal; never paste it in chat.
 
 ```bash
+cd 04-hetzner-terraform   # from the repo root
 terraform init
 terraform fmt -check
 terraform validate

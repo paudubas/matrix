@@ -46,7 +46,7 @@ kubectl --context rancher-desktop exec -n ess -it \
 The chart always advertises `https://` URLs, so the browser must trust a certificate for every `*.ess.localhost` host. A self-signed one (`tls/`, git-ignored) replaces Traefik's default:
 
 ```bash
-cd tls
+mkdir -p 03-ess-rancher/tls && cd 03-ess-rancher/tls    # from the repo root
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -days 365 \
   -keyout ess.key -out ess.crt -subj "/CN=ess.localhost" \
   -addext "subjectAltName=DNS:*.ess.localhost,DNS:ess.localhost" \

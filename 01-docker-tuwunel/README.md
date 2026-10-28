@@ -28,6 +28,7 @@ Register with the demo token `hackathon-2026`. The first account is the admin.
 ## Element client (this folder)
 
 ```bash
+cd 01-docker-tuwunel     # from the repo root
 docker compose up -d     # start Element on 127.0.0.1:8080
 docker compose down      # stop it; Tuwunel keeps running
 ```

@@ -66,13 +66,14 @@ just roles                                                      # download Ansib
 ansible-playbook -i inventory/hosts setup.yml --tags=install-all,ensure-matrix-users-created,start
 ```
 
-Then create the admin and sign in at `https://element.example.com`:
+Then create the admin. The helper prompts for the password (never stored) and runs the playbook's `register-user` step:
 
 ```bash
-ansible-playbook -i inventory/hosts setup.yml \
-  --extra-vars='username=admin password=<strong-password> admin=yes' \
-  --tags=register-user
+./register-user.sh              # from 06-ansible-playbook/; creates "admin" (or the VS Code task "Create Ansible Matrix admin")
+./register-user.sh alice user   # a normal user
 ```
+
+Sign in at `https://element.example.com` as `admin` (Matrix ID `@admin:example.com`; with the Hetzner option, `https://element.<ip-with-dashes>.sslip.io`).
 
 Check the server: `curl https://matrix.example.com/_matrix/client/versions`. For federation, use the Matrix federation tester once DNS and HTTPS are right.
 

@@ -38,6 +38,34 @@ VMs cost about €11/month before VAT, and `terraform destroy` there removes bot
 Both Hetzner servers accept connections only from the configured client IP and
 use plain HTTP, so use disposable accounts.
 
+### Where to run commands
+
+Clone once, then `cd` into the scenario folder first. Compose, Terraform and
+setup commands only work from there (not from the repo root).
+
+```bash
+git clone https://github.com/paudubas/matrix.git && cd matrix
+```
+
+| Scenario | Run from | Start |
+|---|---|---|
+| 1 | `01-docker-tuwunel/` | `docker compose up -d` (Tuwunel itself: see its README) |
+| 2 | `02-docker-synapse/` | `./setup.sh` then `docker compose --env-file .env.synapse up -d` |
+| 3 | `03-ess-rancher/` | see its README (Helm) |
+| 4, 5, 6 VMs | `04-hetzner-terraform/` (or `terraform -chdir=04-hetzner-terraform ...` from the root) | `terraform init && terraform apply` |
+| 5 script | `05-bare-metal/` | `install-tuwunel.sh` on the target machine |
+| 6 playbook | `06-ansible-playbook/` | clone the playbook inside, then `./register-user.sh` |
+| Extra | `extra-kind-synapse/` | see its README |
+
+Reset scenario 2 completely (also deletes its database volume and accounts):
+
+```bash
+cd 02-docker-synapse
+docker compose --env-file .env.synapse down -v --remove-orphans
+rm -rf synapse-data .env.synapse
+./setup.sh && docker compose --env-file .env.synapse up -d
+```
+
 ## Before you start
 
 - Join the event room. Open [Element](https://app.element.io), sign in with a
@@ -98,7 +126,7 @@ The local demos are for local testing, not public federation. For a public serve
 | Element cannot connect | Run `curl http://<homeserver>/_matrix/client/versions`; verify the URL and that its container, service, and port-forward are running. |
 | Docker says container name is already in use | Inspect with `docker ps -a`; start the existing container or choose a different name. Don't remove its data volume to fix a name conflict. |
 | Synapse container exits | In `02-docker-synapse/`, run `docker compose --env-file .env.synapse logs synapse`; confirm the base config exists and Postgres is healthy. |
-| Synapse cannot authenticate to Postgres | Preserve the original `.env.synapse` values; the database volume was initialized with that password. |
+| Synapse cannot authenticate to Postgres | Preserve the original `.env.synapse` values; the database volume was initialized with that password. If `.env.synapse` is lost, do the full reset above (`down -v`). |
 | Kubernetes command targets the wrong cluster | Check `kubectl config current-context` and pass the intended context or kubeconfig explicitly (`extra-kind-synapse/kubeconfig` for the kind cluster). |
 | ESS local hostname does not work | Check the Rancher Kubernetes context, ingress controller, hostnames and chart readiness; `.localhost` does not use public DNS or Let's Encrypt. |
 | Federation fails | Check public DNS, HTTPS, port 443, and `/.well-known/matrix/server`; a local-only setup cannot federate. |

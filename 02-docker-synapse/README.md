@@ -25,7 +25,15 @@ docker compose --env-file .env.synapse exec -it synapse \
   -u admin -a http://localhost:8008
 ```
 
-Then sign in at <http://localhost:8083>.
+Then sign in at <http://localhost:8083> (Matrix ID `@admin:matrix.synapse.test`).
+
+**Paths:** the command runs inside the container, where `./synapse-data` (your laptop) is mounted as `/data`. So `/data/homeserver.yaml` in the command is `synapse-data/homeserver.yaml` on disk. `/tmp/postgres.yaml` exists only inside the container; it is generated at start from the template and `.env.synapse`.
+
+Type the command on one line, or end every line except the last with `\` and nothing after it; otherwise the shell runs each line separately.
+
+Run it from this folder, and only once synapse shows `healthy` in `docker compose --env-file .env.synapse ps`.
+
+**`User ID already taken`?** The admin already exists, so just sign in. Accounts live in the Postgres volume (`matrix-synapse-demo_synapse-postgres`), not in `synapse-data/`, which holds only config, keys and media. Deleting `synapse-data/` does not remove accounts; for an empty server use the full reset below (`down -v`).
 
 ## Operate
 
@@ -34,9 +42,38 @@ curl http://localhost:8018/_matrix/client/versions
 docker compose --env-file .env.synapse ps
 docker compose --env-file .env.synapse logs synapse
 docker compose --env-file .env.synapse down    # keeps the database
+
+# Full reset (deletes database and accounts), then run ./setup.sh again
+docker compose --env-file .env.synapse down -v --remove-orphans
+rm -rf synapse-data .env.synapse
 ```
 
 Do **not** add `-v` unless you want to delete the PostgreSQL volume. Never regenerate `.env.synapse` after the database exists; Postgres needs the original password.
+
+## Troubleshooting: "service synapse is not running"
+
+Look at why it stopped (from this folder):
+
+```bash
+docker compose --env-file .env.synapse ps -a
+docker compose --env-file .env.synapse logs --tail 50 synapse
+```
+
+The usual cause is a leftover database volume with an old password (`password authentication failed`) or a deleted `synapse-data/` or `.env.synapse`. Reset everything and start clean:
+
+```bash
+docker compose --env-file .env.synapse down -v --remove-orphans
+rm -rf synapse-data .env.synapse
+./setup.sh && docker compose --env-file .env.synapse up -d
+```
+
+If `.env.synapse` is already gone and `down -v` fails, run `docker volume rm matrix-synapse-demo_synapse-postgres` first.
+
+Once synapse shows `healthy` in `ps`, create the admin (one line, no backslashes):
+
+```bash
+docker compose --env-file .env.synapse exec -it synapse register_new_matrix_user -c /data/homeserver.yaml -c /tmp/postgres.yaml -u admin -a http://localhost:8008
+```
 
 ## Fresh clone: run setup first
 

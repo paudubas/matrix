@@ -26,6 +26,16 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Create Ansible Matrix admin",
+			"type": "shell",
+			"command": "./register-user.sh",
+			"options": {
+				"cwd": "${workspaceFolder}/06-ansible-playbook"
+			},
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
 			"label": "Create Docker Synapse admin",
 			"type": "shell",
 			"command": "docker",
