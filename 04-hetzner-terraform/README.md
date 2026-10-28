@@ -43,14 +43,31 @@ terraform output -raw homeserver_url
 terraform output -raw registration_token
 ```
 
-An HTTPS-hosted browser client may block an HTTP homeserver; use an HTTP-served client. Data lives on the VM disk and is lost on destroy.
+## Create a Matrix account
+
+Use the Element client at `http://localhost:8080` and choose **Create account**.
+Set the homeserver URL to the value from `terraform output -raw homeserver_url`,
+then enter a username, password and the registration token from
+`terraform output -raw registration_token`. Keep the token private. The Matrix
+ID uses the server's IP, for example `@alice:49.13.150.188`.
+
+The local Element client allows a custom homeserver. An HTTPS-hosted browser
+client may block this plain-HTTP server; use an HTTP-served client.
 
 From the project root, use `terraform -chdir=04-hetzner-terraform ...`.
 
 ## Cleanup
 
-Destroys **both** VMs (scenarios 4 and 5):
+Destroys **both** Hetzner VMs (scenarios 4 and 5), their firewalls and all
+Matrix accounts/data on them. This also stops their cloud charges. Back up
+anything you need, review the plan, and confirm only when you intend to delete
+both servers:
 
 ```bash
 terraform destroy
 ```
+
+If the removed Ansible configuration still has a VM tracked in Terraform
+state, Terraform may also propose deleting it. Inspect the plan carefully
+before confirming; do not apply a plan that would remove resources you want
+to keep.

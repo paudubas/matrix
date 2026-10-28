@@ -30,7 +30,6 @@ Each scenario has its own folder with a README (how to run, operate and clean up
 | 3 | [03-ess-rancher](03-ess-rancher/README.md) | Helm: ESS Community on Rancher Desktop | `https://chat.ess.localhost` (`admin` / `hackathon-2026`) | Running; local certificate must be trusted |
 | 4 | [04-hetzner-terraform](04-hetzner-terraform/README.md) | Terraform: Tuwunel on Hetzner | `http://49.13.150.188:8008` | Running; about €5.49/month before VAT |
 | 5 | [05-bare-metal](05-bare-metal/README.md) | Native Tuwunel (systemd, no Docker) | `http://178.105.190.29:8008` | Running on a second Hetzner VM; the script also works on an old PC or a dedicated server (none ordered) |
-| 6 | [06-ansible-playbook](06-ansible-playbook/README.md) | Ansible: matrix-docker-ansible-deploy (Synapse + Traefik + Element, real HTTPS) | `https://matrix.<ip>.sslip.io` | Prepared (`ansible.tf`), not applied; needs approval for a third VM (about €5.49/month) |
 | Extra | [extra-kind-synapse](extra-kind-synapse/README.md) | Synapse on a local kind cluster | `http://localhost:8009` / Element `http://localhost:8082` | Running; not ESS |
 
 Scenarios 4 and 5 share one Terraform state (in `04-hetzner-terraform/`); the two
@@ -52,10 +51,22 @@ git clone https://github.com/paudubas/matrix.git && cd matrix
 | 1 | `01-docker-tuwunel/` | `docker compose up -d` (Tuwunel itself: see its README) |
 | 2 | `02-docker-synapse/` | `./setup.sh`, then `docker compose --env-file .env.synapse up -d`, wait for `healthy`, then create the admin (steps in its README) |
 | 3 | `03-ess-rancher/` | see its README (Helm) |
-| 4, 5, 6 VMs | `04-hetzner-terraform/` (or `terraform -chdir=04-hetzner-terraform ...` from the root) | `terraform init && terraform apply` |
+| 4, 5 VMs | `04-hetzner-terraform/` (or `terraform -chdir=04-hetzner-terraform ...` from the root) | `terraform init && terraform apply` |
 | 5 script | `05-bare-metal/` | `install-tuwunel.sh` on the target machine |
-| 6 playbook | `06-ansible-playbook/` | clone the playbook inside, then `./register-user.sh` |
 | Extra | `extra-kind-synapse/` | see its README |
+
+## Clean up when finished
+
+Each scenario README has its own cleanup steps. Cleanup can permanently delete
+Matrix accounts and messages; back up anything you need first.
+
+| Scenario | Cleanup |
+|---|---|
+| 1 — Docker Tuwunel | Stop Element, then remove the Tuwunel container and its database volume; see [scenario 1](01-docker-tuwunel/README.md#cleanup). |
+| 2 — Docker Synapse | Stop the stack, or remove its database volume and local configuration for a full reset; see [scenario 2](02-docker-synapse/README.md#cleanup). |
+| 3 — ESS on Rancher Desktop | Uninstall the Helm release and remove the local certificate/trust; see [scenario 3](03-ess-rancher/README.md#cleanup). |
+| 4 and 5 — Hetzner | `terraform -chdir=04-hetzner-terraform destroy` removes both VMs and their data, stopping their cloud charges. Review the plan before confirming. |
+| Extra — kind | `kind delete cluster --name matrix-local` deletes that cluster and its data; see [the extra guide](extra-kind-synapse/README.md#cleanup). |
 
 Reset scenario 2 completely (also deletes its database volume and accounts):
 
@@ -81,7 +92,6 @@ rm -rf synapse-data .env.synapse
   | 3 | Rancher Desktop, `kubectl`, `helm` |
   | 4 | Terraform, a Hetzner Cloud account and API token |
   | 5 | `ssh`, a USB-stick writer, Debian/Ubuntu Server ISO (or Terraform for the VM) |
-  | 6 | Ansible, `just`, `git`, an SSH key, a Linux server and a domain |
   | Extra | Docker, `kind`, `kubectl`, `helm` |
 
   On macOS everything installs with Homebrew (`brew install ...`); Linux and
@@ -99,9 +109,6 @@ use different server names and have separate accounts and databases.
 - **ESS Community** — Element's integrated Kubernetes stack. See the
   [official ESS Helm guide](https://github.com/element-hq/ess-helm).
 - **Element Web** — browser client: `ghcr.io/element-hq/element-web`.
-- **matrix-docker-ansible-deploy** — Ansible playbook for a fuller VM or
-  bare-metal setup.
-
 Avoid Dimension and mxisd/ma1sd; they are unmaintained. Conduwuit was archived;
 use Tuwunel for a new deployment. Treat demo servers as disposable, but keep
 your data directories and volumes until you intentionally remove them.
@@ -144,4 +151,3 @@ secrets, or Terraform state.
 - [Synapse documentation](https://matrix-org.github.io/synapse/latest/)
 - [Tuwunel](https://github.com/matrix-construct/tuwunel)
 - [Element Web](https://github.com/element-hq/element-web)
-- [matrix-docker-ansible-deploy](https://github.com/spantaleev/matrix-docker-ansible-deploy)

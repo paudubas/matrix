@@ -59,6 +59,20 @@ On a Hetzner dedicated server there is no USB stick: the equivalent is Rescue + 
 
 If the PC has a public IP or your client is in another subnet, pass `CLIENT_CIDR=<your-ip>/32` (required for public addresses). A wrong value can lock out SSH.
 
+To uninstall Tuwunel from a machine that you want to keep, stop and disable
+the service, then remove its executable, configuration, token and database.
+This permanently deletes its Matrix accounts and messages. The installer also
+replaced the host's UFW rules; review `sudo ufw status numbered` and adjust
+them for your machine rather than blindly resetting the firewall.
+
+```bash
+sudo systemctl disable --now tuwunel
+sudo rm -f /etc/systemd/system/tuwunel.service /etc/tuwunel.env \
+  /root/tuwunel-registration-token /usr/local/bin/tuwunel
+sudo systemctl daemon-reload
+sudo rm -rf /var/lib/tuwunel
+```
+
 ## What is running now: a second Hetzner VM
 
 No spare PC, so this demo runs the same native install on a Hetzner VM defined in [`../04-hetzner-terraform/native.tf`](../04-hetzner-terraform/native.tf) (`cloud-init-native.yaml.tftpl`). Server `http://178.105.190.29:8008`.
@@ -85,4 +99,17 @@ Ordered via Hetzner Robot (not Terraform), billed monthly. Cheapest seen: AX41-1
    Dedicated servers have no Hetzner Cloud Firewall, so the host `ufw` firewall is essential.
 5. Check `curl http://<server-ip>:8008/_matrix/client/versions` and use that URL in Element.
 
-If your public IP changes, SSH is blocked; use Rescue to reconnect. Cancel the server in Robot when done.
+If your public IP changes, SSH is blocked; use Rescue to reconnect. Back up
+anything you need, then cancel the server in Robot when done to stop its
+monthly charges.
+
+## Cleanup
+
+- **Hetzner Cloud VM (scenario 5):** run
+  `terraform -chdir=04-hetzner-terraform destroy` to remove both Hetzner VMs
+  (scenarios 4 and 5), their data and their cloud charges. Review the plan;
+  this also deletes the other VM.
+- **Old PC:** use the uninstall steps above if you want to keep the computer;
+  otherwise reinstalling the OS removes its data.
+- **Hetzner dedicated server:** back up anything you need and cancel it in
+  Hetzner Robot. The server is billed monthly until cancelled.

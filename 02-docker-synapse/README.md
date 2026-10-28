@@ -56,13 +56,24 @@ curl http://localhost:8018/_matrix/client/versions
 docker compose --env-file .env.synapse ps
 docker compose --env-file .env.synapse logs synapse
 docker compose --env-file .env.synapse down    # keeps the database
+```
 
-# Full reset (deletes database and accounts), then run ./setup.sh again
+## Cleanup
+
+To permanently remove the stack's data and local config:
+
+```bash
+# Full cleanup/reset (deletes database, accounts and local config)
 docker compose --env-file .env.synapse down -v --remove-orphans
 rm -rf synapse-data .env.synapse
 ```
 
-Do **not** add `-v` unless you want to delete the PostgreSQL volume. Never regenerate `.env.synapse` after the database exists; Postgres needs the original password.
+The first `down` command stops the stack while keeping the database. The full
+cleanup permanently deletes all accounts and messages in the PostgreSQL volume
+and removes the local configuration. Back up anything you need first. Do
+**not** add `-v` unless you intend to delete the database. Never regenerate
+`.env.synapse` while keeping the existing database; Postgres needs the original
+password.
 
 ## Troubleshooting: "service synapse is not running"
 

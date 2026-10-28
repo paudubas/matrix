@@ -65,3 +65,27 @@ security add-trusted-cert -r trustRoot -k ~/Library/Keychains/login.keychain-db 
 Remove trust later: `security delete-certificate -c ess.localhost`. Firefox uses its own store, so accept the certificate there. Restart the browser after trusting.
 
 Rancher Desktop forwards host port 443 to Traefik. Port 80 is used by another local app, which doesn't affect the HTTPS URL.
+
+## Cleanup
+
+Uninstall the ESS release and remove its namespace. Deleting the namespace
+permanently deletes ESS accounts, messages and other namespaced data:
+
+```bash
+helm uninstall ess --kube-context rancher-desktop --namespace ess
+kubectl --context rancher-desktop delete namespace ess
+```
+
+If you created the local TLS certificate above, remove the trust entry and
+Rancher Desktop TLS resources as well. On Linux, remove the certificate from
+the system/browser trust store where you added it. This only removes the
+certificate created for this guide; check first if you changed the shared
+default TLS store for another local app.
+
+```bash
+# macOS only
+security delete-certificate -c ess.localhost
+kubectl --context rancher-desktop delete tlsstore default -n kube-system
+kubectl --context rancher-desktop delete secret ess-local-tls -n kube-system
+rm -f tls/ess.crt tls/ess.key
+```

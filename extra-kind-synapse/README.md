@@ -41,7 +41,11 @@ kubectl -n matrix exec -it deployment/synapse-matrix-synapse -- \
   -a http://localhost:8008
 ```
 
-Deleting the cluster permanently deletes its data (only `matrix-local` is affected):
+## Cleanup
+
+Deleting the cluster permanently deletes its Synapse accounts, messages and
+other cluster data (only `matrix-local` is affected). Stop any port-forward
+commands with Ctrl-C, then run:
 
 ```bash
 kind delete cluster --name matrix-local
