@@ -1,6 +1,8 @@
 # 3 — Helm: ESS Community on Rancher Desktop
 
-Open **https://chat.ess.localhost** · login `admin` / `hackathon-2026` (`@admin:ess.localhost`).
+After creating an account below, sign in at **https://chat.ess.localhost** with
+the username and password you chose (`@admin:ess.localhost` if you create the
+admin as `admin`).
 
 ESS Community 26.10.3 runs in namespace `ess` on Rancher Desktop v1.24.0 (Kubernetes v1.34.3; v1.21.0 could not start it). Login redirects to `https://account.ess.localhost` (Matrix Authentication Service). Federation is not configured. ESS is for non-commercial community use; see the [official chart](https://github.com/element-hq/ess-helm).
 
@@ -13,7 +15,7 @@ brew install --cask rancher    # macOS; Linux/Windows: https://rancherdesktop.io
 brew install kubectl helm      # Rancher Desktop also bundles them in ~/.rd/bin
 ```
 
-1. Open Rancher Desktop, choose **dockerd (moby)** or containerd, and set Kubernetes to **v1.34.3 or newer** (the chart needs it; v1.21 of the app couldn't run it). Keep Traefik enabled.
+1. Open Rancher Desktop **Preferences → Kubernetes → Ingress**. Choose **dockerd (moby)** or containerd, set Kubernetes to **v1.34.3 or newer**, and make sure **Enable Traefik** is checked. ESS uses Traefik to serve its local web addresses.
 2. Give it about 4 CPUs and 8 GB RAM, and wait until it reports Kubernetes is running.
 3. Verify: `kubectl --context rancher-desktop get nodes` and `helm version`.
 
@@ -37,8 +39,18 @@ helm upgrade --install ess \
   --kube-context rancher-desktop --namespace ess --create-namespace \
   -f hostnames.yaml -f local-http.yaml \
   --wait --timeout 15m
+```
+
+## Create the admin account
+
+After the chart is installed, run the interactive registration command. Enter
+`admin` as the username, choose a password when prompted, and keep it for
+Element sign-in. The `--admin` flag grants this user admin privileges; this
+does not set a default password.
+
+```bash
 kubectl --context rancher-desktop exec -n ess -it \
-  deploy/ess-matrix-authentication-service -- mas-cli manage register-user
+  deploy/ess-matrix-authentication-service -- mas-cli manage register-user --admin
 ```
 
 ## Local TLS certificate

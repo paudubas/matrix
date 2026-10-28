@@ -27,7 +27,7 @@ Each scenario has its own folder with a README (how to run, operate and clean up
 |---|---|---|---|---|
 | 1 | [01-docker-tuwunel](01-docker-tuwunel/README.md) | Docker: Tuwunel | `http://localhost:8008` / Element `http://localhost:8080` | Running |
 | 2 | [02-docker-synapse](02-docker-synapse/README.md) | Docker: Synapse + PostgreSQL | `http://localhost:8018` / Element `http://localhost:8083` | Running |
-| 3 | [03-ess-rancher](03-ess-rancher/README.md) | Helm: ESS Community on Rancher Desktop | `https://chat.ess.localhost` (`admin` / `hackathon-2026`) | Running; local certificate must be trusted |
+| 3 | [03-ess-rancher](03-ess-rancher/README.md) | Helm: ESS Community on Rancher Desktop | `https://chat.ess.localhost` | Running; create an admin account using the scenario guide; local certificate must be trusted |
 | 4 | [04-hetzner-terraform](04-hetzner-terraform/README.md) | Terraform: Tuwunel on Hetzner | `http://49.13.150.188:8008` | Running; about €5.49/month before VAT |
 | 5 | [05-bare-metal](05-bare-metal/README.md) | Native Tuwunel (systemd, no Docker) | `http://178.105.190.29:8008` | Running on a second Hetzner VM; the script also works on an old PC or a dedicated server (none ordered) |
 | Extra | [extra-kind-synapse](extra-kind-synapse/README.md) | Synapse on a local kind cluster | `http://localhost:8009` / Element `http://localhost:8082` | Running; not ESS |
