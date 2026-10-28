@@ -1,0 +1,14 @@
+public_baseurl: "http://localhost:8018/"
+
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: "__SYNAPSE_DB_PASSWORD__"
+    database: synapse
+    host: postgres
+    port: 5432
+    cp_min: 5
+    cp_max: 10
+
+registration_shared_secret: "__SYNAPSE_REGISTRATION_SECRET__"

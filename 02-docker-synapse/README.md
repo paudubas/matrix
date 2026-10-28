@@ -2,7 +2,7 @@
 
 Server `http://localhost:8018` · Element `http://localhost:8083` · server name `matrix.synapse.test` (admin `@admin:matrix.synapse.test`).
 
-Secrets (`.env.synapse`) and generated config (`synapse-data/`) are git-ignored. Run all commands from this folder.
+Secrets (`.env.synapse`) and generated config (`synapse-data/`) are git-ignored, so after a fresh clone run [`./setup.sh`](#fresh-clone-run-setup-first) first. Run all commands from this folder.
 
 ## Install first
 
@@ -38,16 +38,14 @@ docker compose --env-file .env.synapse down    # keeps the database
 
 Do **not** add `-v` unless you want to delete the PostgreSQL volume. Never regenerate `.env.synapse` after the database exists; Postgres needs the original password.
 
-## Fresh clone only
+## Fresh clone: run setup first
 
-Skip if `.env.synapse` or `synapse-data/homeserver.yaml` already exists. Run from `02-docker-synapse/` (`cd 02-docker-synapse` first), or the secrets file lands in the wrong folder.
+`.env.synapse` and `synapse-data/` are git-ignored, so they don't exist after `git clone`, and every `docker compose` command below fails until you create them. Run once, from this folder:
 
 ```bash
-umask 077
-printf 'SYNAPSE_DB_PASSWORD=%s\nSYNAPSE_REGISTRATION_SECRET=%s\n' \
-  "$(openssl rand -hex 32)" "$(openssl rand -hex 32)" > .env.synapse
-docker compose --env-file .env.synapse run --rm --no-deps --entrypoint /start.py synapse generate
+cd 02-docker-synapse
+./setup.sh
 docker compose --env-file .env.synapse up -d
 ```
 
-Then create the admin as above.
+`setup.sh` creates `.env.synapse` with random secrets, installs `postgres.yaml.template`, and generates the Synapse config. It is safe to re-run and never overwrites an existing `.env.synapse` or config. If the Postgres volume already exists but `.env.synapse` is missing, it stops: the volume keeps its original password, so restore the original file or delete the volume (this loses its data). Then create the admin as above.

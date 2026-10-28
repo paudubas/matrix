@@ -30,6 +30,7 @@ Each scenario has its own folder with a README (how to run, operate and clean up
 | 3 | [03-ess-rancher](03-ess-rancher/README.md) | Helm: ESS Community on Rancher Desktop | `https://chat.ess.localhost` (`admin` / `hackathon-2026`) | Running; local certificate must be trusted |
 | 4 | [04-hetzner-terraform](04-hetzner-terraform/README.md) | Terraform: Tuwunel on Hetzner | `http://49.13.150.188:8008` | Running; about €5.49/month before VAT |
 | 5 | [05-bare-metal](05-bare-metal/README.md) | Native Tuwunel (systemd, no Docker) | `http://178.105.190.29:8008` | Running on a second Hetzner VM; the script also works on an old PC or a dedicated server (none ordered) |
+| 6 | [06-ansible-playbook](06-ansible-playbook/README.md) | Ansible: matrix-docker-ansible-deploy (Synapse + Traefik + Element, real HTTPS) | `https://matrix.<ip>.sslip.io` | Prepared (`ansible.tf`), not applied; needs approval for a third VM (about €5.49/month) |
 | Extra | [extra-kind-synapse](extra-kind-synapse/README.md) | Synapse on a local kind cluster | `http://localhost:8009` / Element `http://localhost:8082` | Running; not ESS |
 
 Scenarios 4 and 5 share one Terraform state (in `04-hetzner-terraform/`); the two
@@ -52,6 +53,7 @@ use plain HTTP, so use disposable accounts.
   | 3 | Rancher Desktop, `kubectl`, `helm` |
   | 4 | Terraform, a Hetzner Cloud account and API token |
   | 5 | `ssh`, a USB-stick writer, Debian/Ubuntu Server ISO (or Terraform for the VM) |
+  | 6 | Ansible, `just`, `git`, an SSH key, a Linux server and a domain |
   | Extra | Docker, `kind`, `kubectl`, `helm` |
 
   On macOS everything installs with Homebrew (`brew install ...`); Linux and
