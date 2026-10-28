@@ -1,0 +1,55 @@
+name: matrix-synapse-demo
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: synapse
+      POSTGRES_DB: synapse
+      POSTGRES_PASSWORD: ${SYNAPSE_DB_PASSWORD:?Set SYNAPSE_DB_PASSWORD in .env.synapse}
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C
+    volumes:
+      - synapse-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synapse -d synapse"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  synapse:
+    image: ghcr.io/element-hq/synapse:latest
+    entrypoint: ["/bin/sh"]
+    command:
+      - "-ec"
+      - |
+        sed \
+          -e "s|__SYNAPSE_DB_PASSWORD__|$${SYNAPSE_DB_PASSWORD}|g" \
+          -e "s|__SYNAPSE_REGISTRATION_SECRET__|$${SYNAPSE_REGISTRATION_SECRET}|g" \
+          /data/conf.d/postgres.yaml.template > /tmp/postgres.yaml
+        exec /start.py run -c /data/homeserver.yaml -c /tmp/postgres.yaml
+    environment:
+      SYNAPSE_CONFIG_PATH: /data/homeserver.yaml
+      SYNAPSE_SERVER_NAME: matrix.synapse.test
+      SYNAPSE_REPORT_STATS: "no"
+    env_file:
+      - ./.env.synapse
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8018:8008"
+    volumes:
+      - ./synapse-data:/data
+    restart: unless-stopped
+
+  element:
+    image: ghcr.io/element-hq/element-web:latest
+    ports:
+      - "127.0.0.1:8083:80"
+    volumes:
+      - ./element-synapse-config.json:/app/config.json:ro
+    restart: unless-stopped
+
+volumes:
+  synapse-postgres:

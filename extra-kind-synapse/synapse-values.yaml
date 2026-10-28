@@ -1,0 +1,48 @@
+serverName: matrix.k8s.test
+publicServerName: matrix.k8s.test
+image:
+  tag: latest
+config:
+  reportStats: false
+  publicBaseurl: http://localhost:8009/
+  enableRegistration: false
+  bindAddresses:
+    - "0.0.0.0"
+signingkey:
+  job:
+    generateImage:
+      repository: ghcr.io/element-hq/synapse
+      tag: latest
+    publishImage:
+      repository: alpine/kubectl
+      tag: "1.34.0"
+postgresql:
+  enabled: false
+externalPostgresql:
+  host: postgres
+  port: 5432
+  username: synapse
+  database: synapse
+  existingSecret: matrix-backends
+  existingSecretPasswordKey: postgres-password
+redis:
+  enabled: false
+externalRedis:
+  host: redis
+  port: 6379
+  existingSecret: matrix-backends
+  existingSecretPasswordKey: redis-password
+ingress:
+  enabled: false
+persistence:
+  enabled: true
+  size: 2Gi
+synapse:
+  strategy:
+    type: Recreate
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi

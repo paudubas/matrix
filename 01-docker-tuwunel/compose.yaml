@@ -1,0 +1,9 @@
+name: matrix
+
+services:
+  element:
+    image: ghcr.io/element-hq/element-web:latest
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./element-config.json:/app/config.json:ro

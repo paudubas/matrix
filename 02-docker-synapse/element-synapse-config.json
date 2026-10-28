@@ -1,0 +1,10 @@
+{
+  "default_server_config": {
+    "m.homeserver": {
+      "base_url": "http://localhost:8018",
+      "server_name": "matrix.synapse.test"
+    }
+  },
+  "disable_custom_urls": true,
+  "brand": "Element - Synapse"
+}

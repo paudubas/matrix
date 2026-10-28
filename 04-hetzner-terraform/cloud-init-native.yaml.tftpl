@@ -1,0 +1,53 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - zstd
+
+write_files:
+  - path: /etc/tuwunel.env
+    owner: root:root
+    permissions: "0600"
+    content: |
+      TUWUNEL_DATABASE_PATH=/var/lib/tuwunel
+      TUWUNEL_ADDRESS=0.0.0.0
+      TUWUNEL_PORT=8008
+      TUWUNEL_ALLOW_REGISTRATION=true
+      TUWUNEL_REGISTRATION_TOKEN=${registration_token}
+  - path: /etc/systemd/system/tuwunel.service
+    owner: root:root
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Tuwunel Matrix homeserver (native)
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      EnvironmentFile=/etc/tuwunel.env
+      ExecStart=/usr/local/bin/tuwunel
+      DynamicUser=yes
+      StateDirectory=tuwunel
+      Restart=on-failure
+      NoNewPrivileges=yes
+      ProtectSystem=strict
+      ProtectHome=yes
+      PrivateTmp=yes
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - |
+    set -eu
+    public_ip="$(curl --fail --silent --show-error --max-time 10 http://169.254.169.254/hetzner/v1/metadata/public-ipv4)"
+    test -n "$${public_ip}"
+    echo "TUWUNEL_SERVER_NAME=$${public_ip}" >> /etc/tuwunel.env
+    curl --fail --silent --show-error --location --retry 5 \
+      --output /tmp/tuwunel.zst \
+      "https://github.com/matrix-construct/tuwunel/releases/download/${tuwunel_version}/${tuwunel_version}-release-all-x86_64-v1-linux-gnu-tuwunel.zst"
+    zstd -d /tmp/tuwunel.zst -o /usr/local/bin/tuwunel
+    chmod 0755 /usr/local/bin/tuwunel
+    rm -f /tmp/tuwunel.zst
+    systemctl daemon-reload
+    systemctl enable --now tuwunel

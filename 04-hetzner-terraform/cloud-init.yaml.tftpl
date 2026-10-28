@@ -1,0 +1,31 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - docker.io
+
+write_files:
+  - path: /etc/tuwunel.env
+    owner: root:root
+    permissions: "0600"
+    content: |
+      TUWUNEL_DATABASE_PATH=/data
+      TUWUNEL_ADDRESS=0.0.0.0
+      TUWUNEL_ALLOW_REGISTRATION=true
+      TUWUNEL_REGISTRATION_TOKEN=${registration_token}
+
+runcmd:
+  - |
+    set -eu
+    systemctl enable --now docker
+    public_ip="$(curl --fail --silent --show-error --max-time 10 http://169.254.169.254/hetzner/v1/metadata/public-ipv4)"
+    test -n "$${public_ip}"
+    docker volume create tuwunel-db
+    docker run --detach \
+      --name tuwunel \
+      --restart unless-stopped \
+      --publish 8008:8008 \
+      --volume tuwunel-db:/data \
+      --env-file /etc/tuwunel.env \
+      --env "TUWUNEL_SERVER_NAME=$${public_ip}" \
+      ghcr.io/matrix-construct/tuwunel:latest

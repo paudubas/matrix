@@ -1,0 +1,16 @@
+serverName: ess.localhost
+synapse:
+  ingress:
+    host: matrix.ess.localhost
+matrixAuthenticationService:
+  ingress:
+    host: account.ess.localhost
+matrixRTC:
+  ingress:
+    host: mrtc.ess.localhost
+elementWeb:
+  ingress:
+    host: chat.ess.localhost
+elementAdmin:
+  ingress:
+    host: admin.ess.localhost

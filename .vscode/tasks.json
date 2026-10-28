@@ -1,0 +1,56 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Create Kubernetes Matrix admin",
+			"type": "shell",
+			"command": "kubectl",
+			"args": [
+				"--kubeconfig",
+				"${workspaceFolder}/extra-kind-synapse/kubeconfig",
+				"-n",
+				"matrix",
+				"exec",
+				"-it",
+				"deployment/synapse-matrix-synapse",
+				"--",
+				"register_new_matrix_user",
+				"-c",
+				"/synapse/config/homeserver.yaml",
+				"-c",
+				"/synapse/config/conf.d/secrets.yaml",
+				"-a",
+				"http://localhost:8008"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Create Docker Synapse admin",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"--env-file",
+				".env.synapse",
+				"exec",
+				"-it",
+				"synapse",
+				"register_new_matrix_user",
+				"-c",
+				"/data/homeserver.yaml",
+				"-c",
+				"/tmp/postgres.yaml",
+				"-u",
+				"admin",
+				"-a",
+				"http://localhost:8008"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/02-docker-synapse"
+			},
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

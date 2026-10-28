@@ -1,0 +1,11 @@
+{
+  "default_server_config": {
+    "m.homeserver": {
+      "base_url": "http://localhost:8008",
+      "server_name": "matrix.example.com"
+    }
+  },
+  "disable_custom_urls": true,
+  "brand": "Element",
+  "default_country_code": "DK"
+}
